@@ -1,31 +1,37 @@
+import React, { useEffect } from "react";
 import "./App.css";
+import { useLocalState } from "./util/useLocalStorage";
+import { Routes, Route } from "react-router-dom";
+import Dashboard from "./Dashboard";
+import HomePage from "./HomePage";
+import Login from "./Login";
+import PrivateRoute from "./PrivateRoute";
+import AssignmentView from "./AssignmentView";
 
 function App() {
-  console.log("HEllo!");
+  const [jwt, setJwt] = useLocalState("", "jwt");
 
-  const reqBody = {
-    username: "bauka",
-    password: "asdfasdf",
-  };
-
-  fetch("api/auth/login", {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "post",
-    body: JSON.stringify(reqBody),
-  })
-    .then((response) => Promise.all([response.json(), response.headers]))
-    .then(([body, headers]) => {
-      const aithValue = headers.get("authorization");
-      console.log(aithValue);
-      console.log(body);
-    })
-    .catch((error) => console.error("Error:", error));
   return (
-    <div className="App">
-      <h1>Hello Bauka!</h1>
-    </div>
+    <Routes>
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/assignments/:id"
+        element={
+          <PrivateRoute>
+            <AssignmentView />
+          </PrivateRoute>
+        }
+      />
+      <Route path="login" element={<Login />} />
+      <Route path="/" element={<HomePage />} />
+    </Routes>
   );
 }
 
